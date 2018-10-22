@@ -4,7 +4,7 @@
 
     use Psr\Http\Message\ResponseInterface;
 
-    class Emitter implements InterfaceEmitter
+    class Emitter implements EmitterInterface
     {
         /**
          * @var array $empty
@@ -28,7 +28,7 @@
             if (!headers_sent()) {
                 foreach ($response->getHeaders() as $name => $values) {
                     foreach ($values as $value) {
-                        header(sprintf('%s: %s', $name, $value), $first);
+                        header(sprintf('%s: %s', $name, $value));
                     }
                 }
                 header(sprintf(
@@ -48,7 +48,7 @@
          */
         private function body(ResponseInterface $response): ResponseInterface
         {
-            if (!in_array($response->getStatusCode(), $empty)) {
+            if (!in_array($response->getStatusCode(), $this->empty)) {
                 
                 $body = $response->getBody();
                 if ($body->isSeekable()) {
