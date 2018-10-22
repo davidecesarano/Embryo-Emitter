@@ -1,0 +1,24 @@
+{
+    "name": "davidecesarano/embryo-emitter",
+    "type": "project",
+    "description": "Emitting psr-7 responses.",
+    "homepage": "https://github.com/davidecesarano/Embryo-Emitter",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Davide Cesarano",
+            "email": "davide.cesarano@unipegaso.it",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=7.1",
+        "psr/http-message": "1.0.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Embryo\\": "src/"
+        }
+    },
+    "minimum-stability": "dev"
+}
