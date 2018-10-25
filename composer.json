@@ -1,7 +1,7 @@
 {
     "name": "davidecesarano/embryo-emitter",
     "type": "project",
-    "description": "Emitting psr-7 responses.",
+    "description": "Emitter for psr-7 response.",
     "homepage": "https://github.com/davidecesarano/Embryo-Emitter",
     "license": "MIT",
     "authors": [

@@ -7,17 +7,17 @@
     class Emitter implements EmitterInterface
     {
         /**
-         * @var array $empty
+         * @var array $responseIsEmpty
          */
-        private $empty = [204, 205, 304];
+        private $responseIsEmpty = [204, 205, 304];
 
         /**
-         * @var int
+         * @var int $sizeLimit
          */
-        private $size = 4096;
+        private $sizeLimit = 4096;
 
         /**
-         * Sends headers, protocol, status code and reason
+         * Emits headers, protocol, status code and reason
          * phrase from response.
          *
          * @param ResponseInterface $response
@@ -26,52 +26,52 @@
         private function headers(ResponseInterface $response): void
         {
             if (!headers_sent()) {
+                
                 foreach ($response->getHeaders() as $name => $values) {
+                    $cookie = stripos($name, 'Set-Cookie') === 0 ? false : true;
                     foreach ($values as $value) {
-                        header(sprintf('%s: %s', $name, $value));
+                        header(sprintf('%s: %s', $name, $value), $cookie);
+                        $cookie = false;
+                    
                     }
                 }
+
                 header(sprintf(
                     'HTTP/%s %s %s',
                     $response->getProtocolVersion(),
                     $response->getStatusCode(),
                     $response->getReasonPhrase()
                 ), true, $response->getStatusCode());
+
             }
         }
 
         /**
-         * Write body.
+         * Writes body.
          *
          * @param ResponseInterface $response
          * @return ResponseInterface
          */
         private function body(ResponseInterface $response): ResponseInterface
         {
-            if (!in_array($response->getStatusCode(), $this->empty)) {
+            if (!in_array($response->getStatusCode(), $this->responseIsEmpty)) {
                 
-                $body = $response->getBody();
-                if ($body->isSeekable()) {
-                    $body->rewind();
+                $stream = $response->getBody();
+                if ($stream->isSeekable()) {
+                    $stream->rewind();
                 }
 
-                $contentLength = (!$response->getHeaderLine('Content-Length')) ? $body->getSize() : $response->getHeaderLine('Content-Length');
-                if (isset($contentLength)) {
-                    $lengthToRead = $contentLength;
-                    while ($lengthToRead > 0 && !$body->eof()) {
-                        $data = $body->read(min($this->size, $lengthToRead));
+                $bufferLenght = (!$response->getHeaderLine('Content-Length')) ? $stream->getSize() : $response->getHeaderLine('Content-Length');
+                if (isset($bufferLenght)) {
+                    $lengthToRead = $bufferLenght;
+                    while ($lengthToRead > 0 && !$stream->eof()) {
+                        $data = $stream->read(min($this->sizeLimit, $lengthToRead));
                         echo $data;
                         $lengthToRead -= strlen($data);
-                        if (connection_status() != CONNECTION_NORMAL) {
-                            break;
-                        }
                     }
                 } else {
-                    while (!$body->eof()) {
-                        echo $body->read($this->size);
-                        if (connection_status() != CONNECTION_NORMAL) {
-                            break;
-                        }
+                    while (!$stream->eof()) {
+                        echo $stream->read($this->size);
                     }
                 }
 
@@ -80,7 +80,7 @@
         }
 
         /**
-         * Emit response.
+         * Emits response.
          *
          * @param ResponseInterface $response
          * @return void
