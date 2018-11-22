@@ -1,4 +1,4 @@
-# Embryo-Emitter
+# Embryo Emitter
 Emitter for PSR-7 response.
 
 ## Requirements
