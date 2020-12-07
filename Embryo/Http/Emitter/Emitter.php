@@ -1,5 +1,12 @@
 <?php 
 
+    /**
+     * Emitter
+     * 
+     * @author Davide Cesarano <davide.cesarano@unipegaso.it>
+     * @link   https://github.com/davidecesarano/embryo-emitter 
+     */
+
     namespace Embryo\Http\Emitter;
 
     use Psr\Http\Message\ResponseInterface;
@@ -28,7 +35,9 @@
             if (!headers_sent()) {
                 
                 foreach ($response->getHeaders() as $name => $values) {
-                    $cookie = stripos($name, 'Set-Cookie') === 0 ? false : true;
+                    $name = str_replace('_', '-', $name);
+                    $name = ucwords(strtolower($name), '-');
+                    $cookie = $name !== 'Set-Cookie';
                     foreach ($values as $value) {
                         header(sprintf('%s: %s', $name, $value), $cookie);
                         $cookie = false;
@@ -71,7 +80,7 @@
                     }
                 } else {
                     while (!$stream->eof()) {
-                        echo $stream->read($this->size);
+                        echo $stream->read($this->sizeLimit);
                     }
                 }
 
@@ -83,7 +92,7 @@
          * Emits response.
          *
          * @param ResponseInterface $response
-         * @return void
+         * @return mixed
          */
         public function emit(ResponseInterface $response)
         {
